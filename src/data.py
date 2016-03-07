@@ -1,18 +1,15 @@
-import csv
 import math
 import copy
-import numpy as np
-import plotly
-from plotly.tools import FigureFactory
-from plotly.graph_objs import Scatter, Layout
-import psycopg2
+from database import Database
 
 class Data:
     # setup and read data from the provided filename
-    def __init__(self):
+    def __init__(self, limit_total):
         # implementation specific details
+        # currently using 7 dimensions
         self.data_start_index = 1
         self.data_end_index = 7
+        self.limit_total = limit_total # number of samples
 
         # data structures for raw data, cleaned data and calculations
         self.data = [] # populated after read_data
@@ -24,28 +21,10 @@ class Data:
         self.standardize_data()
         self.calculate_distance_matrix()
 
-    # read all of the data from the CSV into a 2D array for parsing and
-    # calculations
     def read_data(self):
-        self.conn = psycopg2.connect("dbname='spotifyechonest' user='owner' host='localhost' password='h4ck3r'")
-        self.cur = self.conn.cursor()
-        sql = """SELECT name,
-            round(loudness::numeric, 8),
-            round(danceability::numeric, 8),
-            round(energy::numeric, 8),
-            round(speechiness::numeric, 8),
-            round(liveness::numeric, 8),
-            round(acousticness::numeric, 8),
-            round(instrumentalness::numeric, 8) FROM tracks LIMIT 30;"""
-
-        self.cur.execute(sql)
-        cur = 0
-        for row in self.cur.fetchall():
-            self.data.append([])
-            for col in row:
-                self.data[cur].append(col)
-            cur += 1
-
+        db = Database()
+        self.data = db.read_data(self.limit_total)
+        db.close()
 
     # the length of the data set, assume all columns the same length
     def data_length(self):
