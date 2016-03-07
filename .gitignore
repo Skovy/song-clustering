@@ -1,1 +1,2 @@
-dendrogram_with_labels.html
+*.html
+*.pyc

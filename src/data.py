@@ -36,7 +36,7 @@ class Data:
             round(speechiness::numeric, 8),
             round(liveness::numeric, 8),
             round(acousticness::numeric, 8),
-            round(instrumentalness::numeric, 8) FROM tracks LIMIT 2000;"""
+            round(instrumentalness::numeric, 8) FROM tracks LIMIT 30;"""
 
         self.cur.execute(sql)
         cur = 0
@@ -115,14 +115,3 @@ class Data:
     # get the standardized vector given a data point index
     def get_vector(self, index):
         return self.standardized_data[index][self.data_start_index:self.data_end_index + 1]
-
-
-d = Data()
-names = []
-for row in d.data:
-    names.append(row[0])
-
-x = np.array(d.distance_matrix)
-fig = FigureFactory.create_dendrogram(x, orientation='left', labels=names)
-fig['layout'].update({'width':1600, 'height':80000, 'margin': { 'l': 400 }})
-plotly.offline.plot(fig, filename='dendrogram_with_labels')
